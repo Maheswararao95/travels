@@ -1,0 +1,39 @@
+package com.test.rules;
+unit VisaCheck;
+
+import com.test.*;
+
+
+rule "Italian citizens do not require visa to US"
+	when
+		$trip: /trip[ $trip.to == "US" ]
+		$traveller: /traveller[ $traveller.nationality == "Italian" ]
+	then
+		$trip.setIsVisaRequired( false );
+end
+
+rule "Polish citizens do not require visa to US"
+	when
+		$trip: /trip[ $trip.to == "US" ]
+		$traveller: /traveller[ $traveller.nationality == "Polish" ]
+	then
+		$trip.setIsVisaRequired( false );
+end
+
+rule "Polish citizens do not require visa to UK"
+	when
+		$trip: /trip[ $trip.to == "UK" ]
+		$traveller:  /traveller[ $traveller.nationality == "Polish" ]
+	then
+		$trip.setIsVisaRequired( false );
+end
+
+rule "Polish citizens require visa to Australia"
+	when
+		$trip:  /trip[ $trip.to == "Australia" ]
+		$traveller : /traveller[ $traveller.nationality == "Polish" ]
+	then
+		$trip.setIsVisaRequired( true );
+		$traveller.setElgibleForTravelling(false);
+end
+
