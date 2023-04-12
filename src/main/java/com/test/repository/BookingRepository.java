@@ -17,7 +17,7 @@ public class BookingRepository {
 
     public Booking save(Booking booking) {
         Random rd = new Random();
-        booking.setId(rd.nextLong());
+        booking.setId(Math.abs(rd.nextLong()));
         booking.setBookingDateTime(LocalDateTime.now());
         data.put(booking.getId(), booking);
         return booking;

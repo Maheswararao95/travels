@@ -1,6 +1,7 @@
 package com.test.model;
 
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.lookup.PlanningId;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
 /**
@@ -8,7 +9,7 @@ import org.optaplanner.core.api.domain.variable.PlanningVariable;
  */
 @PlanningEntity
 public class TravellerSeatAllocation {
-   
+    @PlanningId
     private Long id;
     
     @PlanningVariable(valueRangeProviderRefs = "bookingList")

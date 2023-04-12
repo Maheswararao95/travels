@@ -13,27 +13,39 @@ public class FlightBookingConstraintProvider implements ConstraintProvider {
     @Override
     public Constraint[] defineConstraints(ConstraintFactory constraintFactory) {
         return new Constraint[] {
-            onlyOnePassengerPerSeatConstraint(constraintFactory),
+            onlyOnePassengerPerSeatConstraint(constraintFactory)
+            ,
+            onlyOneSeatPerPassengerConstraint(constraintFactory)
+            ,
             allocatePrefSeat(constraintFactory)
         };
     }
 
+    /**
+     * Max one seat per booking.
+     * @param constraintFactory
+     * @return
+     */
+    private Constraint onlyOneSeatPerPassengerConstraint(ConstraintFactory constraintFactory) {
+       return constraintFactory.forEachUniquePair(TravellerSeatAllocation.class,
+            Joiners.equal(TravellerSeatAllocation::getBooking)
+        )
+        .penalize(HardSoftScore.ONE_HARD).asConstraint("Only one passenger per seat");
+    }
+
     private Constraint onlyOnePassengerPerSeatConstraint(ConstraintFactory constraintFactory) {
-        return constraintFactory.forEach(TravellerSeatAllocation.class)
-        .join(TravellerSeatAllocation.class, 
-            Joiners.equal(TravellerSeatAllocation::getBooking),
-            Joiners.equal(TravellerSeatAllocation::getSeat),
-            Joiners.lessThan(TravellerSeatAllocation::getId))
-            .penalize(HardSoftScore.ONE_HARD).asConstraint("Only one seat per passenger");
+        return constraintFactory.forEachUniquePair(TravellerSeatAllocation.class,
+            Joiners.equal(TravellerSeatAllocation::getSeat)
+        )
+        .penalize(HardSoftScore.ONE_HARD).asConstraint("Only one seat per passenger");
     }
 
     private Constraint allocatePrefSeat(ConstraintFactory constraintFactory) {
         return constraintFactory.forEach(TravellerSeatAllocation.class)
-        .join(TravellerSeatAllocation.class, 
-            Joiners.equal(TravellerSeatAllocation::getBooking),
-            Joiners.equal(TravellerSeatAllocation::getSeat))
-        .filter((b, s) -> b.getBooking().getPrefType() != s.getSeat().getType())
+        .filter(allocation -> allocation.getBooking().getPrefType() != null 
+            && allocation.getBooking().getPrefType() != allocation.getSeat().getType())
         .penalize(HardSoftScore.ONE_SOFT).asConstraint("Preffered seats");
     }
     
 }
+
